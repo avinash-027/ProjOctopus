@@ -1,0 +1,39 @@
+﻿namespace OpenAIapi.Models
+{
+    public class FoodDietInputModel
+    {
+        public string FoodText { get; set; }
+    }
+
+    public class FoodReportItem
+    {
+        public string FoodName { get; set; }
+        public double Calories { get; set; }
+        public double ProteinGrams { get; set; }
+        public double CarbohydratesGrams { get; set; }
+        public double FatsGrams { get; set; }
+        public string ServingSize { get; set; }
+        public string Vitamins { get; set; }
+        public List<string> Suggestions { get; set; } 
+    }
+    
+    public class GeminiResponseModel
+    {
+        public List<Candidate> Candidates { get; set; }
+    }
+
+    public class Candidate
+    {
+        public Content Content { get; set; }
+    }
+
+    public class Content
+    {
+        public List<Part> Parts { get; set; }
+    }
+
+    public class Part
+    {
+        public string Text { get; set; }
+    }
+}
