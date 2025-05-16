@@ -32,7 +32,7 @@ namespace OpenAIapi.Controllers
 
             try
             {
-                var report = await nutritionService.GenerateNutritionReportAsync(foodListText.FoodText);
+                List<FoodReportItem> report = await nutritionService.GenerateNutritionReportAsync(foodListText.FoodText);
                 return Ok(report);
             }
             catch (InvalidOperationException ex)
