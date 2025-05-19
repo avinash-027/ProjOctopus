@@ -23,7 +23,7 @@ namespace OpenAIapi.Services
         {
             var prompt = $"Analyze the following food items(INPUT): \"{foodText.Trim()}\". If no specific quantity or unit is mentioned for an item, assume a **standard single serving size** for that food. Provide a structured JSON array containing the foodName, calories, protein_g, carbs_g, fats_g, servingSize, and vitamins for each. Additionally, include a 'suggestions' property as a list of 2-3 health diet suggestions related to these foods. Ensure all numeric values (e.g., calories, protein_g, carbs_g, fats_g) are formatted to 2 decimal places (e.g., 25.00).";
             prompt += "\nOutput ONLY a valid JSON array like: [ { \"foodName\": \"Apple\", \"calories\": 95, \"protein_g\": 0.5, \"carbs_g\": 25, \"fats_g\": 0.3, \"servingSize\": \"1 medium (182g)\", \"vitamins\": \"C, A\", \"suggestions\": [\"Enjoy as a snack to boost fiber intake.\", \"Pair with nuts for a balanced snack.\"] }, ... ]";
-            prompt += "\n\nIf the input is not related to food or nutrition, or if it's a casual conversation, respond with a friendly message indicating that you can process food-related requests for nutrition analysis. For example, 'Hi, I can help with food and nutrition analysis! What food items are you curious about today?' or 'My expertise is in nutrition. Could you please tell me about the food items you'd like analyzed?'";
+            prompt += "\n\nIf the input is not related to food or nutrition, or it's casual conversation, respond with... Its just example, 'Hi there! I'm your Nutrition Assistant. Tell me what you've eaten, and I'll break down the nutritional info for you!' or 'Hello! I'm your Nutrition Assistant. I specialize in analyzing food and providing nutritional insights. What food items would you like me to look into today?'";
 
             // Build Request Body
             var requestBody = new
@@ -66,7 +66,8 @@ namespace OpenAIapi.Services
 
             var result = new NutritionReportResult
             {
-                RawResponse = nutritionReportJson
+                RawResponse = nutritionReportJson,
+                Items = new List<FoodReportItem>()
             };
 
             // Only try parsing if it looks like JSON
@@ -76,6 +77,7 @@ namespace OpenAIapi.Services
                 {
                     var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                     result.Items = JsonSerializer.Deserialize<List<FoodReportItem>>(nutritionReportJson, options);
+                    result.RawResponse = "RawResponse is parsed as it looks like JSON";
                     result.IsValidJson = result.Items != null;
                 }
                 catch (JsonException)

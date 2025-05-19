@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using OpenAIapi.Models;
 using System.Text.RegularExpressions;
 using OpenAIapi.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OpenAIapi.Controllers
 {
@@ -22,6 +23,7 @@ namespace OpenAIapi.Controllers
             this.nutritionService = nutritionService;
         }
 
+        [Authorize]
         [HttpPost("generate-nutrition-report")]
         public async Task<IActionResult> GenerateNutritionReport([FromBody] FoodDietInputModel foodListText)
         {
@@ -36,14 +38,20 @@ namespace OpenAIapi.Controllers
 
                 if (result.IsValidJson && result.Items != null)
                 {
-                    return Ok(result.Items);
+                    return Ok(new
+                    {
+                        message = "Response was a structured nutrition report.",
+                        rawResponse = result.RawResponse,
+                        foodItems = result.Items
+                    });
                 }
                 else
                 {
                     return Ok(new
                     {
                         message = "Response was not a structured nutrition report.",
-                        rawResponse = result.RawResponse
+                        rawResponse = result.RawResponse,
+                        foodItems = result.Items
                     });
                 }
             }
