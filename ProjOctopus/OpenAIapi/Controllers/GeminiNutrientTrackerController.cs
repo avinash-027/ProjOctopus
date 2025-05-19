@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using OpenAIapi.Models;
 using System.Text.RegularExpressions;
 using OpenAIapi.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OpenAIapi.Controllers
 {
@@ -22,6 +23,7 @@ namespace OpenAIapi.Controllers
             this.nutritionService = nutritionService;
         }
 
+        [Authorize]
         [HttpPost("generate-nutrition-report")]
         public async Task<IActionResult> GenerateNutritionReport([FromBody] FoodDietInputModel foodListText)
         {
