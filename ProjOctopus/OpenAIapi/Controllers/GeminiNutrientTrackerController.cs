@@ -25,29 +25,40 @@ namespace OpenAIapi.Controllers
         [HttpPost("generate-nutrition-report")]
         public async Task<IActionResult> GenerateNutritionReport([FromBody] FoodDietInputModel foodListText)
         {
-            if (string.IsNullOrWhiteSpace(foodListText?.FoodText))
+            if (string.IsNullOrWhiteSpace(foodListText?.Text))
             {
                 return BadRequest("Please provide the food items as a single string.");
             }
 
             try
             {
-                List<FoodReportItem> report = await nutritionService.GenerateNutritionReportAsync(foodListText.FoodText);
-                return Ok(report);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-            catch (JsonException ex)
-            {
-                return StatusCode(500, "Failed to parse nutrition report from Gemini API response: " + ex.Message);
+                NutritionReportResult result = await nutritionService.GenerateNutritionReportAsync(foodListText.Text);
+
+                if (result.IsValidJson && result.Items != null)
+                {
+                    return Ok(result.Items);
+                }
+                else
+                {
+                    return Ok(new
+                    {
+                        message = "Response was not a structured nutrition report.",
+                        rawResponse = result.RawResponse
+                    });
+                }
             }
             catch (HttpRequestException ex)
             {
-                return StatusCode(500, "Error communicating with Gemini API: " + ex.Message);
+                return StatusCode(502, "Error communicating with Gemini API: " + ex.Message);
             }
-            // Catch more specific exceptions as needed
+            catch (JsonException ex)
+            {
+                return StatusCode(500, "Failed to parse nutrition report: " + ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(500, "Gemini API returned an invalid response: " + ex.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, "An unexpected error occurred: " + ex.Message);
@@ -69,7 +80,7 @@ namespace OpenAIapi.Controllers
 //a medium apple, two standard bananas, 150 grams of cooked rice, one chicken breast fillet, a handful of raw spinach
 
 #endregion
-#region Notes -- 
+#region Notes-- 
 
 // BASE URL
 // "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=GEMINI_API_KEY"

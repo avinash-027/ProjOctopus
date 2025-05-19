@@ -1,10 +1,15 @@
 ﻿namespace OpenAIapi.Models
 {
+    public class NutritionReportResult
+    {
+        public bool IsValidJson { get; set; }
+        public List<FoodReportItem>? Items { get; set; }
+        public string RawResponse { get; set; } = string.Empty;
+    }
     public class FoodDietInputModel
     {
-        public string FoodText { get; set; }
+        public string Text { get; set; }
     }
-
     public class FoodReportItem
     {
         public string FoodName { get; set; }
@@ -14,7 +19,7 @@
         public double FatsGrams { get; set; }
         public string ServingSize { get; set; }
         public string Vitamins { get; set; }
-        public List<string> Suggestions { get; set; } 
+        public List<string> Suggestions { get; set; }
     }
     
     public class GeminiResponseModel

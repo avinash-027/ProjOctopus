@@ -4,6 +4,6 @@ namespace OpenAIapi.Services
 {
     public interface IGeminiNutritionService
     {
-        Task<List<FoodReportItem>> GenerateNutritionReportAsync(string foodText);
+        Task<NutritionReportResult> GenerateNutritionReportAsync(string foodText);
     }
 }

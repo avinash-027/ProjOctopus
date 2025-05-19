@@ -1,5 +1,8 @@
-
+using Microsoft.AspNetCore.Http.HttpResults;
 using OpenAIapi.Services;
+using System.IO;
+using System.Net.Http;
+using System.Runtime.Intrinsics.X86;
 
 namespace OpenAIapi
 {
@@ -8,16 +11,13 @@ namespace OpenAIapi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-            builder.Services.AddHttpClient();
             
-            builder.Services.AddHttpClient<IGeminiNutritionService, GeminiNutritionService>();
-
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddHttpClient<IGeminiNutritionService, GeminiNutritionService>();
 
             var app = builder.Build();
 
@@ -32,10 +32,11 @@ namespace OpenAIapi
 
             app.UseAuthorization();
 
-
             app.MapControllers();
 
             app.Run();
         }
     }
 }
+
+
