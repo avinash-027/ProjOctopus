@@ -66,7 +66,8 @@ namespace OpenAIapi.Services
 
             var result = new NutritionReportResult
             {
-                RawResponse = nutritionReportJson
+                RawResponse = nutritionReportJson,
+                Items = new List<FoodReportItem>()
             };
 
             // Only try parsing if it looks like JSON
@@ -76,6 +77,7 @@ namespace OpenAIapi.Services
                 {
                     var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                     result.Items = JsonSerializer.Deserialize<List<FoodReportItem>>(nutritionReportJson, options);
+                    result.RawResponse = "RawResponse is parsed as it looks like JSON";
                     result.IsValidJson = result.Items != null;
                 }
                 catch (JsonException)

@@ -38,14 +38,20 @@ namespace OpenAIapi.Controllers
 
                 if (result.IsValidJson && result.Items != null)
                 {
-                    return Ok(result.Items);
+                    return Ok(new
+                    {
+                        message = "Response was a structured nutrition report.",
+                        rawResponse = result.RawResponse,
+                        foodItems = result.Items
+                    });
                 }
                 else
                 {
                     return Ok(new
                     {
                         message = "Response was not a structured nutrition report.",
-                        rawResponse = result.RawResponse
+                        rawResponse = result.RawResponse,
+                        foodItems = result.Items
                     });
                 }
             }

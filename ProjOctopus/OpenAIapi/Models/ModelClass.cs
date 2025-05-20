@@ -14,9 +14,9 @@
     {
         public string FoodName { get; set; }
         public double Calories { get; set; }
-        public double ProteinGrams { get; set; }
-        public double CarbohydratesGrams { get; set; }
-        public double FatsGrams { get; set; }
+        public double protein_g { get; set; }
+        public double carbs_g { get; set; }
+        public double fats_g { get; set; }
         public string ServingSize { get; set; }
         public string Vitamins { get; set; }
         public List<string> Suggestions { get; set; }
