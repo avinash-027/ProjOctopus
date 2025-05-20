@@ -21,9 +21,9 @@ namespace OpenAIapi
             {
                 options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
                 {
-                    Title = "OpenAI API",
+                    Title = "GeminiAI API",
                     Version = "v1",
-                    Description = "JWT Authenticated API for testing OpenAIapi endpoints",
+                    Description = "JWT Authenticated API for testing GeminiAIapi endpoints",
                 });
 
                 // Add JWT Authentication to Swagger

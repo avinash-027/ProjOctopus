@@ -23,37 +23,33 @@ namespace OpenAIapi.Controllers
             this.nutritionService = nutritionService;
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("generate-nutrition-report")]
-        public async Task<IActionResult> GenerateNutritionReport([FromBody] FoodDietInputModel foodListText)
+
+        public async Task<IActionResult> GenerateNutritionReport([FromBody] FoodDietInputModel model)
         {
-            if (string.IsNullOrWhiteSpace(foodListText?.Text))
-            {
-                return BadRequest("Please provide the food items as a single string.");
-            }
+
+            //if (string.IsNullOrWhiteSpace(model?.Text))
+            //{
+            //    return BadRequest("Please provide the food items as a single string.");
+            //}
+            //// Set defaults if not provided
+            //model.WeightKg ??= 70;
+            //model.HeightCm ??= 170;
+            //model.Age ??= 30;
+            //model.Gender ??= "Unspecified";
+            //model.HealthConditions ??= new List<string>
+            //{     "No known health conditions"    };
 
             try
             {
-                NutritionReportResult result = await nutritionService.GenerateNutritionReportAsync(foodListText.Text);
-
-                if (result.IsValidJson && result.Items != null)
+                NutritionReportResult result = await nutritionService.GenerateNutritionReportAsync(model);
+                return Ok(new
                 {
-                    return Ok(new
-                    {
-                        message = "Response was a structured nutrition report.",
-                        rawResponse = result.RawResponse,
-                        foodItems = result.Items
-                    });
-                }
-                else
-                {
-                    return Ok(new
-                    {
-                        message = "Response was not a structured nutrition report.",
-                        rawResponse = result.RawResponse,
-                        foodItems = result.Items
-                    });
-                }
+                    message = result.IsValidJson ? "Structured nutrition report generated." : "Unstructured output from Gemini.",
+                    rawResponse = result.RawResponse,
+                    foodItems = result.Items
+                });
             }
             catch (HttpRequestException ex)
             {

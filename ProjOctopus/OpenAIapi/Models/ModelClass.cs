@@ -8,18 +8,24 @@
     }
     public class FoodDietInputModel
     {
-        public string Text { get; set; }
+        public required string Text { get; set; }
+        public required float WeightKg { get; set; }
+        public required float HeightCm { get; set; }
+        public required int Age { get; set; }
+        public required List<string> HealthConditions { get; set; }
     }
     public class FoodReportItem
     {
-        public string FoodName { get; set; }
-        public double Calories { get; set; }
+        public string foodName { get; set; }
+        public double calories { get; set; }
         public double protein_g { get; set; }
         public double carbs_g { get; set; }
         public double fats_g { get; set; }
-        public string ServingSize { get; set; }
-        public string Vitamins { get; set; }
-        public List<string> Suggestions { get; set; }
+        public string servingSize { get; set; }
+        public string vitamins { get; set; }
+        public bool canConsume { get; set; }
+        public string reason { get; set; }
+        public List<string> suggestions { get; set; }
     }
     
     public class GeminiResponseModel

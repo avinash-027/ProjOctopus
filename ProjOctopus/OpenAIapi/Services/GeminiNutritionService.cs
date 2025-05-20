@@ -1,5 +1,6 @@
 ﻿using OpenAIapi.Models;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -18,13 +19,70 @@ namespace OpenAIapi.Services
             _httpClient.BaseAddress = new Uri("https://generativelanguage.googleapis.com/v1beta/");
             _geminiApiKey = configuration["GeminiApiKey"]!;
         }
-
-        public async Task<NutritionReportResult> GenerateNutritionReportAsync(string foodText)
+        private static string TryExtractJsonArray(string text)
         {
-            var prompt = $"Analyze the following food items(INPUT): \"{foodText.Trim()}\". If no specific quantity or unit is mentioned for an item, assume a **standard single serving size** for that food. Provide a structured JSON array containing the foodName, calories, protein_g, carbs_g, fats_g, servingSize, and vitamins for each. Additionally, include a 'suggestions' property as a list of 2-3 health diet suggestions related to these foods. Ensure all numeric values (e.g., calories, protein_g, carbs_g, fats_g) are formatted to 2 decimal places (e.g., 25.00).";
-            prompt += "\nOutput ONLY a valid JSON array like: [ { \"foodName\": \"Apple\", \"calories\": 95, \"protein_g\": 0.5, \"carbs_g\": 25, \"fats_g\": 0.3, \"servingSize\": \"1 medium (182g)\", \"vitamins\": \"C, A\", \"suggestions\": [\"Enjoy as a snack to boost fiber intake.\", \"Pair with nuts for a balanced snack.\"] }, ... ]";
-            prompt += "\n\nIf the input is not related to food or nutrition, or it's casual conversation, respond with... Its just example, 'Hi there! I'm your Nutrition Assistant. Tell me what you've eaten, and I'll break down the nutritional info for you!' or 'Hello! I'm your Nutrition Assistant. I specialize in analyzing food and providing nutritional insights. What food items would you like me to look into today?'";
+            var startIndex = text.IndexOf('[');
+            var endIndex = text.LastIndexOf(']');
+            if (startIndex >= 0 && endIndex > startIndex)
+            {
+                return text.Substring(startIndex, endIndex - startIndex + 1);
+            }
+            return text;
+        }
+        public static string GenerateNutritionPrompt(FoodDietInputModel model)
+        {
+            string prompt;
+            string[] defaultFoodItems =
+            {
+                "Vegetable Upma", "Masala Chai with Low-Fat Milk", "Boiled Moong Sprouts Chaat",
+                "Paneer Bhurji with Multigrain Roti", "Cucumber and Carrot Sticks", "Brown Rice with Rajma (Kidney Beans Curry)",
+                "Curd (Plain Low-Fat Yogurt)", "Roasted Makhana (Fox Nuts)", "Vegetable Dalia (Broken Wheat Porridge)",
+                "Buttermilk (Chaas)", "Grilled Tandoori Chicken Breast", "Palak Soup (Spinach Soup)",
+                "Steamed Idli with Coconut Chutney", "Fruits Salad (Papaya, Apple, Pomegranate)",
+                "Oats and Banana Smoothie with Almond Milk"
+            };
 
+            var userDetails = $"The user is a {model.Age}-year-old weighing {model.WeightKg}kg, height {model.HeightCm}cm. " +
+                              $"Health conditions: {string.Join(", ", model.HealthConditions ?? new List<string>())}.";
+
+            if (!string.IsNullOrWhiteSpace(model.Text))
+            {
+                var random = new Random();
+                var selectedFoods = defaultFoodItems.OrderBy(x => random.Next()).Take(5).ToList();
+                var selectedFoodString = string.Join(", ", selectedFoods.Select(f => $"\"{f}\""));
+
+                prompt = $"Analyze the following food items(INPUT): TAKE a default 5 food items from 1-day sample diet plan" +
+                         $"If no specific quantity or unit is mentioned for an item, assume a **standard single serving size** for that food. " +
+                         $"Provide a structured JSON array containing (for each item) the foodName, calories, protein_g, carbs_g, fats_g, " +
+                         $"servingSize, vitamins, and a canConsume boolean and reason string explaining if it's suitable based on user's health " +
+                         $"and body profile & INPUT. Additionally, include a 'suggestions' property as a list of 2-3 health diet suggestions related to these foods. " +
+                         $"Ensure all numeric values (e.g., calories, protein_g, carbs_g, fats_g) are formatted to 2 decimal places.\n\n" +
+                         $"{userDetails}";
+
+                prompt += "\nMAKE SURE TO GENERATE JUST ONLY THE BELLOW JSON FORMAT";
+
+                prompt += "\nOutput ONLY a valid JSON array like: [ { \"foodName\": \"Apple\", \"calories\": 95, \"protein_g\": 0.5, \"carbs_g\": 25, \"fats_g\": 0.3, \"servingSize\": \"1 medium (182g)\", \"vitamins\": \"C, A\", \"canConsume\": true, \"reason\": \"Suitable for most diets.\", \"suggestions\": [\"Enjoy as a snack to boost fiber intake.\", \"Pair with nuts for a balanced snack.\"] }, ... ]";
+            }
+            else
+            {
+                // Analyze specific food items entered by the user
+                prompt = $"Analyze the following food items(INPUT): \"{model.Text.Trim()}\". " +
+                         $"If no specific quantity or unit is mentioned for an item, assume a **standard single serving size** for that food. " +
+                         $"Provide a structured JSON array containing (for each item) the foodName, calories, protein_g, carbs_g, fats_g, " +
+                         $"servingSize, vitamins, and a canConsume boolean and reason string explaining if it's suitable based on user's health " +
+                         $"and body profile & INPUT. Additionally, include a 'suggestions' property as a list of 2-3 health diet suggestions related to these foods. " +
+                         $"Ensure all numeric values (e.g., calories, protein_g, carbs_g, fats_g) are formatted to 2 decimal places.\n\n" +
+                         $"{userDetails}";
+
+                prompt += "\nIf the input is not related to food or nutrition, or it's casual conversation, respond with a friendly message like: " +
+                          "'Hi there! I'm your Nutrition Assistant. Tell me what you've eaten, and I'll break down the nutritional info for you!'";
+
+                prompt += "\nOutput ONLY a valid JSON array like: [ { \"foodName\": \"Apple\", \"calories\": 95, \"protein_g\": 0.5, \"carbs_g\": 25, \"fats_g\": 0.3, \"servingSize\": \"1 medium (182g)\", \"vitamins\": \"C, A\", \"canConsume\": true, \"reason\": \"Suitable for most diets.\", \"suggestions\": [\"Enjoy as a snack to boost fiber intake.\", \"Pair with nuts for a balanced snack.\"] }, ... ]";
+            }
+            return prompt;
+        }
+        public async Task<string> CallGeminiGenerateContentAsync(string prompt)
+        {
             // Build Request Body
             var requestBody = new
             {
@@ -59,10 +117,25 @@ namespace OpenAIapi.Services
             // Extract JSON Output
             var geminiOutputText = geminiResponse.Candidates[0].Content.Parts[0].Text;
 
+            return geminiOutputText;
+        }
+        public async Task<NutritionReportResult> GenerateNutritionReportAsync(FoodDietInputModel model)
+        {
+            string prompt = GenerateNutritionPrompt(model);
+            string geminiOutputText = await CallGeminiGenerateContentAsync(prompt);
+
             // Tries to extract JSON block wrapped in triple backticks (common in LLM output).
             // This pattern is meant to extract a JSON block enclosed in a markdown-style code
-            var match = Regex.Match(geminiOutputText, @"```json\n([\s\S]*?)\n```");
-            var nutritionReportJson = match.Success ? match.Groups[1].Value : geminiOutputText.Trim();
+            //var match = Regex.Match(geminiOutputText, @"```(?:json)?\s*(\[.*\])\s*```", RegexOptions.Singleline);
+            //var match = Regex.Match(geminiOutputText, @"```json\n([\s\S]*?)\n```");
+
+            //var nutritionReportJson = match.Success ? match.Groups[1].Value : geminiOutputText.Trim();
+
+            // Extract JSON array
+            var match = Regex.Match(geminiOutputText, @"```(?:json)?\s*(\[.*?\])\s*```", RegexOptions.Singleline);
+            string nutritionReportJson = match.Success
+                ? match.Groups[1].Value
+                : TryExtractJsonArray(geminiOutputText).Trim();
 
             var result = new NutritionReportResult
             {
