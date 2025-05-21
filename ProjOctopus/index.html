@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nutrition API Form</title>
+</head>
+<body>
+  <h2>Nutrition Report Form</h2>
+  <form id="nutritionForm">
+    <label>
+      Food Text:
+      <input type="text" name="text" value="I have eaten Biryani chicken, apple" required>
+    </label><br><br>
+    <label>
+      Weight (kg):
+      <input type="number" name="weightKg" value="70" required>
+    </label><br><br>
+    <label>
+      Height (cm):
+      <input type="number" name="heightCm" value="175" required>
+    </label><br><br>
+    <label>
+      Age:
+      <input type="number" name="age" value="30" required>
+    </label><br><br>
+    <label>
+      Health Conditions:
+      <input type="text" name="healthConditions" value="No known health conditions" required>
+    </label><br><br>
+    <button type="submit">Get Nutrition Report</button>
+  </form>
+
+  <pre id="response"></pre>
+
+  <script>
+    document.getElementById('nutritionForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      // Gather form data
+      const form = e.target;
+      const data = {
+        text: form.text.value,
+        weightKg: Number(form.weightKg.value),
+        heightCm: Number(form.heightCm.value),
+        age: Number(form.age.value),
+        healthConditions: [form.healthConditions.value]
+      };
+
+      // Make the API call
+      try {
+        const response = await fetch('https://your-api-endpoint.com/nutrition', { // Replace with your actual URL
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        document.getElementById('response').textContent = JSON.stringify(result, null, 2);
+      } catch (err) {
+        document.getElementById('response').textContent = 'Error: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

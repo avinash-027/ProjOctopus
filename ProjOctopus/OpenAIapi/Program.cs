@@ -15,6 +15,18 @@ namespace OpenAIapi
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var corsPolicyName = "AllowAll";
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: corsPolicyName,
+                    policy =>
+                    {
+                        policy.AllowAnyOrigin()
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                    });
+            });
+
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -82,6 +94,9 @@ namespace OpenAIapi
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            // Enable CORS globally or on specific endpoints
+            app.UseCors(corsPolicyName);
 
             app.UseHttpsRedirection();
             app.UseAuthentication();
