@@ -9,6 +9,7 @@ using OpenAIapi.Models;
 using System.Text.RegularExpressions;
 using OpenAIapi.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 #region pre-inputs
 
@@ -31,6 +32,12 @@ namespace OpenAIapi.Controllers
         public GeminiNutrientTrackerController(IGeminiNutritionService nutritionService)
         {
             this.nutritionService = nutritionService;
+        }
+
+        [HttpGet]
+        public ActionResult Get()
+        {
+            return Ok("hi..Don't worry i work");
         }
 
         //[Authorize]
