@@ -25,7 +25,7 @@ namespace OpenAIapi.Controllers
         public IActionResult Login([FromBody] LoginRequest request)
         {
             // Hardcoded user
-            if (request.Username == "admin" && request.Password == "password123")
+            if (request.Username == "abc@abc" && request.Password == "123123")
             {
                 var accessToken = GenerateToken(request.Username, 15); // 15 min
                 var refreshToken = Guid.NewGuid().ToString(); // simplistic refresh token

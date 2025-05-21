@@ -24,6 +24,11 @@
 }
 ```
 
+> Response Body
+
+```
+Check
+```
 ---
 
 ### Input - Case 01

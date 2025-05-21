@@ -19,39 +19,20 @@ namespace OpenAIapi.Services
             _httpClient.BaseAddress = new Uri("https://generativelanguage.googleapis.com/v1beta/");
             _geminiApiKey = configuration["GeminiApiKey"]!;
         }
-        private static string TryExtractJsonArray(string text)
+        private static bool IsPlaceholderText(string text)
         {
-            var startIndex = text.IndexOf('[');
-            var endIndex = text.LastIndexOf(']');
-            if (startIndex >= 0 && endIndex > startIndex)
-            {
-                return text.Substring(startIndex, endIndex - startIndex + 1);
-            }
-            return text;
+            var placeholders = new[] { "string", "text", "enter food", "enter food here", "type here", "example", "default" };
+            return placeholders.Any(p => string.Equals(text.Trim(), p, StringComparison.OrdinalIgnoreCase));
         }
         public static string GenerateNutritionPrompt(FoodDietInputModel model)
         {
             string prompt;
-            string[] defaultFoodItems =
-            {
-                "Vegetable Upma", "Masala Chai with Low-Fat Milk", "Boiled Moong Sprouts Chaat",
-                "Paneer Bhurji with Multigrain Roti", "Cucumber and Carrot Sticks", "Brown Rice with Rajma (Kidney Beans Curry)",
-                "Curd (Plain Low-Fat Yogurt)", "Roasted Makhana (Fox Nuts)", "Vegetable Dalia (Broken Wheat Porridge)",
-                "Buttermilk (Chaas)", "Grilled Tandoori Chicken Breast", "Palak Soup (Spinach Soup)",
-                "Steamed Idli with Coconut Chutney", "Fruits Salad (Papaya, Apple, Pomegranate)",
-                "Oats and Banana Smoothie with Almond Milk"
-            };
-
             var userDetails = $"The user is a {model.Age}-year-old weighing {model.WeightKg}kg, height {model.HeightCm}cm. " +
                               $"Health conditions: {string.Join(", ", model.HealthConditions ?? new List<string>())}.";
 
-            if (!string.IsNullOrWhiteSpace(model.Text))
+            if (string.IsNullOrWhiteSpace(model.Text) || IsPlaceholderText(model.Text))
             {
-                var random = new Random();
-                var selectedFoods = defaultFoodItems.OrderBy(x => random.Next()).Take(5).ToList();
-                var selectedFoodString = string.Join(", ", selectedFoods.Select(f => $"\"{f}\""));
-
-                prompt = $"Analyze the following food items(INPUT): TAKE a default 5 food items from 1-day sample diet plan" +
+                prompt = $"Analyze the following food items(INPUT): TAKE a randamly 5 food items from 1-day sample diet plan" +
                          $"If no specific quantity or unit is mentioned for an item, assume a **standard single serving size** for that food. " +
                          $"Provide a structured JSON array containing (for each item) the foodName, calories, protein_g, carbs_g, fats_g, " +
                          $"servingSize, vitamins, and a canConsume boolean and reason string explaining if it's suitable based on user's health " +
@@ -81,6 +62,7 @@ namespace OpenAIapi.Services
             }
             return prompt;
         }
+
         public async Task<string> CallGeminiGenerateContentAsync(string prompt)
         {
             // Build Request Body
@@ -119,23 +101,16 @@ namespace OpenAIapi.Services
 
             return geminiOutputText;
         }
+
         public async Task<NutritionReportResult> GenerateNutritionReportAsync(FoodDietInputModel model)
         {
             string prompt = GenerateNutritionPrompt(model);
             string geminiOutputText = await CallGeminiGenerateContentAsync(prompt);
 
-            // Tries to extract JSON block wrapped in triple backticks (common in LLM output).
             // This pattern is meant to extract a JSON block enclosed in a markdown-style code
-            //var match = Regex.Match(geminiOutputText, @"```(?:json)?\s*(\[.*\])\s*```", RegexOptions.Singleline);
-            //var match = Regex.Match(geminiOutputText, @"```json\n([\s\S]*?)\n```");
-
-            //var nutritionReportJson = match.Success ? match.Groups[1].Value : geminiOutputText.Trim();
-
-            // Extract JSON array
-            var match = Regex.Match(geminiOutputText, @"```(?:json)?\s*(\[.*?\])\s*```", RegexOptions.Singleline);
-            string nutritionReportJson = match.Success
-                ? match.Groups[1].Value
-                : TryExtractJsonArray(geminiOutputText).Trim();
+            // Tries to extract JSON block wrapped in triple backticks (common in LLM output).
+            var match = Regex.Match(geminiOutputText, @"```json\n([\s\S]*?)\n```");
+            var nutritionReportJson = match.Success ? match.Groups[1].Value : geminiOutputText.Trim();
 
             var result = new NutritionReportResult
             {
