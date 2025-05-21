@@ -18,6 +18,7 @@
   "weightKg": 70,
   "heightCm": 175,
   "age": 30,
+  "gender": "male",
   "healthConditions": [
     "Heart Issue"
   ]
@@ -41,6 +42,7 @@ Check
   "weightKg": 70,
   "heightCm": 175,
   "age": 30,
+  "gender": "male",
   "healthConditions": [
     "No known health conditions"
   ]
@@ -101,6 +103,7 @@ Check
   "weightKg": 70,
   "heightCm": 175,
   "age": 30,
+  "gender": "male",
   "healthConditions": [
     "No known health conditions"
   ]
@@ -127,6 +130,7 @@ Check
   "weightKg": 70,
   "heightCm": 175,
   "age": 30,
+  "gender": "male",
   "healthConditions": [
     "Heart Issue"
   ]
