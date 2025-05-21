@@ -12,6 +12,7 @@
         public required float WeightKg { get; set; }
         public required float HeightCm { get; set; }
         public required int Age { get; set; }
+        public required string Gender { get; set; }
         public required List<string> HealthConditions { get; set; }
     }
     public class FoodReportItem

@@ -27,7 +27,7 @@ namespace OpenAIapi.Services
         public static string GenerateNutritionPrompt(FoodDietInputModel model)
         {
             string prompt;
-            var userDetails = $"The user is a {model.Age}-year-old weighing {model.WeightKg}kg, height {model.HeightCm}cm. " +
+            var userDetails = $"The user is a {model.Age}-year-old {model.Gender} weighing {model.WeightKg}kg, height {model.HeightCm}cm. " +
                               $"Health conditions: {string.Join(", ", model.HealthConditions ?? new List<string>())}.";
 
             if (string.IsNullOrWhiteSpace(model.Text) || IsPlaceholderText(model.Text))
