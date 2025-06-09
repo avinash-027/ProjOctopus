@@ -1,3 +1,93 @@
+🚪 Authentication Endpoints (/api/Auth)
+🔐 POST /api/Auth/login
+Description: Authenticates a user and returns a JWT access token and a refresh token.
+
+Input (application/json):
+
+
+{
+  "username": "abc@abc",
+  "password": "123123"
+}
+Output (application/json):
+
+
+{
+  "accessToken": "eyJhbGciOi...",
+  "refreshToken": "some-guid-token"
+}
+🔄 POST /api/Auth/refresh
+Description: Refreshes the JWT access token using a valid refresh token.
+
+Input:
+
+{
+  "refreshToken": "some-guid-token"
+}
+Output:
+
+{
+  "accessToken": "new-access-token"
+}
+🔒 GET /api/Auth/secure
+Description: A test endpoint to verify if JWT-based authentication is working.
+
+Authorization: Requires Bearer Token in the Authorization header.
+
+Output:
+
+Hi, this is a secure endpoint!
+🧠 Nutrition Report Endpoints (/api/GeminiNutrientTracker)
+✅ GET /api/GeminiNutrientTracker
+Description: Basic test endpoint to confirm the API is working.
+
+Output:
+
+hi..Don't worry i work
+🍽️ POST /api/GeminiNutrientTracker/generate-nutrition-report
+Description: Submits a food intake description and user data to generate a nutrition report using the Gemini API.
+
+Input (application/json):
+
+
+{
+  "text": "I have eaten Biryani chicken, apple",
+  "weightKg": 70,
+  "heightCm": 175,
+  "age": 30,
+  "gender": "male",
+  "healthConditions": [
+    "Heart Issue"
+  ]
+}
+Response (application/json): Can be either:
+
+✅ Structured report:
+
+{
+  "message": "Structured nutrition report generated.",
+  "rawResponse": "RawResponse is parsed as it looks like JSON",
+  "foodItems": [
+    {
+      "foodName": "Biryani Chicken",
+      "calories": 500,
+      ...
+    },
+    ...
+  ]
+}
+❌ Unstructured fallback:
+
+{
+  "message": "Unstructured output from Gemini.",
+  "rawResponse": "Hi there! I'm your Nutrition Assistant...",
+  "foodItems": []
+}
+
+
+
+
+
 ## 📝
 
 [GitHub link - ProjOctopus.git](https://github.com/avinash-027/ProjOctopus.git)

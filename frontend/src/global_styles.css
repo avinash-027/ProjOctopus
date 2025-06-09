@@ -1,0 +1,187 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+:root {
+  --rich-black: #0d1b2aff;
+  --oxford-blue: #1b263bff;
+  --yinmn-blue: #415a77ff;
+  --silver-lake-blue: #778da9ff;
+  --platinum: #e0e1ddff;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--rich-black);
+  color: var(--platinum);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.btn {
+  @apply px-4 py-2 rounded-md transition-all duration-200 font-medium;
+}
+
+.btn-primary {
+  @apply bg-[#415a77ff] hover:bg-[#778da9ff] text-[#e0e1ddff];
+}
+
+.btn-secondary {
+  @apply bg-[#1b263bff] hover:bg-[#415a77ff] text-[#e0e1ddff];
+}
+
+.btn-outline {
+  @apply border border-[#778da9ff] text-[#e0e1ddff] hover:bg-[#1b263bff];
+}
+
+.input-field {
+  @apply bg-[#1b263bff] border border-[#415a77ff] rounded-md px-4 py-2 text-[#e0e1ddff] w-full focus:outline-none focus:ring-2 focus:ring-[#778da9ff];
+}
+
+.card {
+  @apply bg-[#1b263bff] rounded-lg shadow-lg p-6 transition-all duration-300;
+}
+
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300;
+}
+
+.modal-content {
+  @apply bg-[#0d1b2aff] border border-[#415a77ff] rounded-lg shadow-xl p-6 w-full max-w-md mx-auto transition-all duration-300;
+}
+
+.nav-link {
+  @apply relative px-4 py-2 text-[#e0e1ddff] font-medium transition-all duration-200;
+}
+
+.nav-link:hover {
+  @apply text-[#778da9ff];
+}
+
+.nav-link.active {
+  @apply text-[#778da9ff];
+}
+
+.nav-link.active::after {
+  content: '';
+  @apply absolute bottom-0 left-0 w-full h-0.5 bg-[#778da9ff] rounded-full;
+}
+
+/* Loading Spinner */
+.spinner {
+  @apply inline-block w-8 h-8 border-4 border-[#415a77ff] border-t-[#778da9ff] rounded-full animate-spin;
+}
+
+/* Feature card */
+.feature-card {
+  @apply bg-[#1b263bff] rounded-lg p-6 hover:shadow-xl transition-all duration-300 border border-[#415a77ff] hover:border-[#778da9ff];
+}
+
+/* Form styling */
+.form-group {
+  @apply mb-4;
+}
+
+.form-label {
+  @apply block text-[#e0e1ddff] mb-2 font-medium;
+}
+
+.form-error {
+  @apply text-red-500 text-sm mt-1;
+}
+
+/* Report styling */
+.nutrition-item {
+  @apply border-b border-[#415a77ff] py-3 last:border-b-0;
+}
+
+/* Feature Section Styles */
+.feature-row {
+  @apply opacity-0 transform translate-y-8 transition-all duration-700 ease-out;
+}
+
+.feature-row.animate-slide-in {
+  @apply opacity-100 transform translate-y-0;
+}
+
+.feature-image-container {
+  @apply relative overflow-hidden rounded-2xl shadow-2xl transform transition-all duration-500 hover:scale-105;
+}
+
+.feature-image {
+  @apply w-full h-80 object-cover transition-transform duration-700 hover:scale-110;
+}
+
+.feature-icon {
+  @apply inline-flex items-center justify-center w-16 h-16 bg-[#415a77ff] rounded-2xl text-[#e0e1ddff] mb-4 transform transition-all duration-300 hover:scale-110 hover:bg-[#778da9ff];
+}
+
+/* Hero Section Enhancements */
+.hero-background {
+  @apply absolute inset-0 bg-gradient-to-br from-[#0d1b2aff]/80 via-[#1b263bff]/60 to-[#415a77ff]/40;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes slideInUp {
+  from { 
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.slide-in-up {
+  animation: slideInUp 0.4s ease-out;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--rich-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--yinmn-blue);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--silver-lake-blue);
+}
+
+/* Responsive text scaling */
+@media (max-width: 768px) {
+  .feature-image {
+    @apply h-64;
+  }
+}
